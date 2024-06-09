@@ -1,0 +1,193 @@
+---
+title: "Class 14: RNASeq Mini Project"
+author: "Arshiya Zarmahd (PID: A16247996)"
+format: pdf
+---
+
+Here we run through a complete RNASeq analysis from counts to pathways and biological insight...
+
+## Data Import
+
+```{r}
+library(DESeq2)
+```
+
+```{r}
+countData = read.csv("GSE37704_featurecounts.csv", row.names=1)
+colData = read.csv("GSE37704_metadata.csv", row.names=1)
+```
+
+Wee Peak:
+
+```{r}
+head(colData)
+```
+
+```{r}
+head(countData)
+```
+
+Lets remove the troublesome first column from `countData`.
+
+```{r}
+countData[, -1]
+```
+
+```{r}
+countData.new <- countData[, 1]
+head(countData.new)
+```
+
+```{r}
+to.keep.inds <- rowSums(countData) > 0
+countData <- countData[to.keep.inds,]
+```
+
+## Setup for DESeq
+
+```{r}
+library(DESeq2)
+```
+
+## Add Gene Annotation Data (Gene Names, etc.)
+
+```{r}
+library("AnnotationDbi")
+library("org.Hs.eg.db")
+
+columns(org.Hs.eg.db)
+
+res$symbol = mapIds(org.Hs.eg.db,
+                    keys=row.names(res), 
+                    keytype="ENSEMBL",
+                    column="SYMBOL",
+                    multiVals="first")
+
+res$entrez = mapIds(org.Hs.eg.db,
+                    keys=row.names(res),
+                    keytype="ENSEMBL",
+                    column="ENTREZID",
+                    multiVals="first")
+
+head(res, 10)
+```
+
+```{r}
+res = res[order(res$pvalue),]
+write.csv(res, alpha="deseq_results.csv")
+```
+
+## Pathway Analysis (KEGG, GO, Reactome)
+
+```{r}
+library(gage)
+library(gageData)
+
+data(kegg.sets.hs)
+data(sigmet.idx.hs)
+```
+
+```{r}
+head(kegg.sets.hs, 3)
+```
+
+```{r}
+foldchanges = res$log2FoldChange
+names(foldchanges) = res$entrez
+head(foldchanges)
+```
+
+```{r}
+keggres = gage(foldchanges, gsets=kegg.sets.hs)
+```
+
+```{r}
+attributes(keggres)
+```
+
+```{r}
+head(keggres$less)
+```
+
+```{r}
+pathview(gene.data=foldchanges, pathway.id="hsa04110")
+```
+
+```{r}
+pathview(gene.data=foldchanges, pathway.id="hsa04110", kegg.native=FALSE)
+```
+
+```{r}
+keggrespathways <- rownames(keggres$greater)[1:5]
+
+keggresids = substr(keggrespathways, start=1, stop=8)
+keggresids
+```
+
+```{r}
+pathview(gene.data=foldchanges, pathway.id=keggresids, species="hsa")
+```
+
+```{r}
+data(go.sets.hs)
+data(go.subs.hs)
+
+gobpsets = go.sets.hs[go.subs.hs$BP]
+
+gobpres = gage(foldchanges, gsets=gobpsets, same.dir=TRUE)
+
+lapply(gobpres, head)
+```
+
+```{r}
+sig_genes <- res[res$padj <= 0.05 & !is.na(res$padj), "symbol"]
+print(paste("Total number of significant genes:", length(sig_genes)))
+```
+
+```{r}
+write.table(sig_genes, file="significant_genes.txt", row.names=FALSE, col.names=FALSE, quote=FALSE)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

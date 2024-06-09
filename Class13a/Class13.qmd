@@ -1,0 +1,214 @@
+---
+title: "Class 13: DESeq Analysis"
+author: "Arshiya Zarmahd (PID: A16247996)"
+format: pdf
+---
+
+This week we are looking at differential expression analysis. 
+
+The data for this hands-on session comes from a published RNA-seq experiment where airway smooth muscle cells were treated with dexamethasone, a synthetic glucocorticoid steroid with anti-inflammatory effects (Himes et al., 2014). 
+
+## Import/Read Data from Himes
+
+```{r}
+counts <- read.csv("airway_scaledcounts.csv",
+                   row.names=1)
+metadata <- read.csv("airway_metadata.csv")
+```
+
+Lets have a wee peak at this data!
+
+```{r}
+head(metadata)
+```
+
+Sanity Check on correspondence of counts and metadata
+
+```{r}
+all( metadata$id == colnames(counts) )
+```
+
+```{r}
+all( c(T, T, F, T) )
+```
+
+> Q1. How many genes are in this dataset?
+
+There are `nrow(counts)` genes in this dataset.
+
+```{r}
+nrow(counts)
+```
+
+> Q2. How many control cell lines do we have?
+
+There are `n.control` control cell lines in this dataset
+
+```{r}
+n.control <- sum(metadata$dex == "control") 
+n.control
+```
+
+## Extract and Summarize Control Data
+
+To find out where the control samples are, we need the metadata.
+
+```{r}
+control <- metadata[metadata$dex == "control", ]
+control.counts <- counts[ , control$id]
+control.mean <- rowMeans(control.counts)
+head(control.mean)
+```
+
+## Extract and Summarize the Treated (ie. Drug) Samples
+
+```{r}
+treated <- metadata[metadata$dex == "treated", ]
+treated.counts <- counts[ , treated$id]
+treated.mean <- rowMeans(treated.counts)
+```
+
+Store these results in a new data frame called `meancounts`. 
+
+```{r}
+meancounts <- data.frame(control.mean, treated.mean)
+```
+
+Lets make a plot to explore the results a little
+
+```{r}
+plot(meancounts[,1], meancounts[,2])
+```
+
+```{r}
+library(ggplot2)
+```
+
+```{r}
+ggplot(meancounts) + 
+  aes(control.mean, treated.mean) + 
+  geom_point()
+```
+
+We will make a log-log plot to draw out this skewed data and see what is going on. 
+
+```{r}
+plot(meancounts[,1], meancounts[,2], log="xy",
+     xlab="log of control counts",
+     ylab="log of treated counts ")
+```
+
+We often use log2 transformations when dealing with this sort of data. 
+
+```{r}
+log2(20/20)
+```
+
+```{r}
+log2(40/20)
+```
+
+```{r}
+log2(20/40)
+```
+
+```{r}
+log2(80/20)
+```
+
+This log2 transformation has this nice property where if there is no change the log2 value will be zero and if its double the log2 value will be 1. If halved, it will be -1. 
+
+Lets add a log2 fold change column to our results. 
+
+```{r}
+meancounts$log2fc <- log2(meancounts$treated.mean / 
+                          meancounts$control.mean)
+```
+
+```{r}
+head(meancounts)
+```
+
+We need to get rid of zero count genes that we can not say anything about.
+
+```{r}
+head(meancounts[,1:2]==0)
+```
+
+```{r}
+head(which(meancounts[,1:2]==0, arr.ind=TRUE))
+
+```
+
+```{r}
+zero.values <- which(meancounts[,1:2]==0, arr.ind=TRUE)
+to.rm <- unique(zero.values[,1])
+mycounts <- meancounts[-to.rm, ]
+```
+
+```{r}
+head(mycounts)
+```
+
+How many genes remain?
+
+```{r}
+nrow(mycounts)
+```
+
+## Use Fold Change to See Up and Down Regulated Genes
+
+A common threshold used for calling something differently expressed is a log2(FoldChange) of greater than 2 or less than -2. Lets filter the dataset both ways to see how many genes are up or down regulated. 
+
+Up-Regulated:
+
+```{r}
+sum(mycounts$log2fc > 2)
+```
+
+Down-Regulated:
+
+```{r}
+sum(mycounts$log2fc < -2)
+```
+
+Do we trust these results? No, because we don't yet know if these changes are significant. 
+
+## DESeq2 Analysis
+
+```{r}
+library(DESeq2)
+
+dds <- DESeqDataSetFromMatrix(countData=counts,
+                              colData=metadata,
+                              design=~dex)
+```
+
+```{r}
+dds <- DESeq(dds)
+```
+
+```{r}
+res <- results(dds)
+res
+```
+
+We can get some basic summary tallies using the `summary()` function. 
+
+```{r}
+summary(res, alpha=0.05)
+```
+
+## Volcano Plot
+
+Make a summary of our results. 
+
+```{r}
+plot(res$log2FoldChange, -log(res$padj))
+```
+
+Finish by saving results. 
+
+```{r}
+write.csv(res, file="DESeq2_results.csv")
+```

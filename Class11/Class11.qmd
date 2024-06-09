@@ -1,0 +1,25 @@
+---
+title: "Class 11: Intro to Genome Informatics"
+author: "Arshiya Zarmahd (PID: A16247996)"
+format: pdf
+---
+
+## Proportion of Homozygous (*G|G*) Individuals in a Population
+
+Downloaded a CSV file from Ensemble < https://useast.ensembl.org/Homo_sapiens/Variation/Sample?db=core;r=17:39894595-39895595;v=rs8067378;vdb=variation;vf=959672880 >
+
+Here we read this CSV file:
+
+```{r}
+mxl <- read.csv("373531-SampleGenotypes-Homo_sapiens_Variation_Sample_rs8067378.csv")
+head(mxl)
+```
+
+
+
+
+
+
+
+
+
