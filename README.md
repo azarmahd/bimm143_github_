@@ -10,7 +10,9 @@ This repo is for my Bioinformatics class at UCSD, Spring Quarter of 2024.
 - Class 6 [R Functions](https://github.com/azarmahd/bimm143_github_/blob/main/Class06/Class06.pdf)
 - Class 7 [Machine Learning](https://github.com/azarmahd/bimm143_github_/blob/main/Class07/Class07.pdf)
 - Class 8 [Breast Cancer Mini-Project](https://github.com/azarmahd/bimm143_github_/blob/main/Class08/Class08.pdf)
-- Class 9 [Candy Analysis Mini-Prject][https://github.com/azarmahd/bimm143_github_/blob/main/Class09/Class%209_%20Candy%20Analysis%20Mini%20Project.pdf]
+- Class 9 [Candy Analysis Mini-Prject](https://github.com/azarmahd/bimm143_github_/blob/main/Class09/Class%209_%20Candy%20Analysis%20Mini%20Project.pdf)
 - Class 10 [Structural Bioinformatics](https://github.com/azarmahd/bimm143_github_/blob/main/Class10/Class10.pdf)
-
-
+- Class 11 [Intro to Genome Informatics Lab](https://github.com/azarmahd/bimm143_github_/blob/main/Class11/Class11.pdf)
+- Class 13(a) [DESeq Analysis](https://github.com/azarmahd/bimm143_github_/blob/main/Class13a/Class13.pdf)
+- Class 14 [RNA-Seq Analysis Mini-Project]()
+- Class 18 [Pertussis Mini-Project]()
