@@ -15,4 +15,5 @@ This repo is for my Bioinformatics class at UCSD, Spring Quarter of 2024.
 - Class 11 [Intro to Genome Informatics Lab](https://github.com/azarmahd/bimm143_github_/blob/main/Class11/Class11.pdf)
 - Class 13(a) [DESeq Analysis](https://github.com/azarmahd/bimm143_github_/blob/main/Class13a/Class13.pdf)
 - Class 14 [RNA-Seq Analysis Mini-Project]()
-- Class 18 [Pertussis Mini-Project]()
+- Class 16 Essential UNIX for Bioinformatics
+- Class 18 [Pertussis Mini-Project](https://github.com/azarmahd/bimm143_github_/blob/main/Class18/Class18.pdf)
